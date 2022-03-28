@@ -29,8 +29,13 @@ pub fn process_instruction(
         ContractInstruction::Init => {
             let accounts_iter = &mut accounts.iter();
 
-            // Load account info - storage for this contract
-            let helloworld_account_info = next_account_info(accounts_iter)?;
+            let helloworld_account_info = next_account_info(accounts_iter)?; // storage for this contract
+            let liquidity_mint_info = next_account_info(accounts_iter)?; // Token to be used as provided liquidity
+            let liquidity_token_account_info = next_account_info(accounts_iter)?; // Account which will receive this liquidity
+            let collateral_mint_info = next_account_info(accounts_iter)?; // Collateral mint account to store new Token (mint)
+            let authority_info = next_account_info(accounts_iter)?;
+            let rent_info = next_account_info(accounts_iter)?; // Rent info is a system account that is used to calculate rent checks
+            let _spl_token_info = next_account_info(accounts_iter)?;
 
             // The account must be owned by the program in order to modify its data (it's init offchain with proper ID)
             if helloworld_account_info.owner != program_id {
@@ -45,17 +50,6 @@ pub fn process_instruction(
                 return Err(ProgramError::AccountAlreadyInitialized);
             }
 
-            // Token to be used as provided liquidity
-            let liquidity_mint_info = next_account_info(accounts_iter)?;
-
-            // Account which will receive this liquidity
-            let liquidity_token_account_info = next_account_info(accounts_iter)?;
-
-            // Collateral mint account to store new Token (mint)
-            let collateral_mint_info = next_account_info(accounts_iter)?;
-
-            let authority_info = next_account_info(accounts_iter)?;
-
             // Check that provided authority account is correct
             let (authority, authority_bump_seed) =
                 find_authority_bump_seed(program_id, &helloworld_account_info.key);
@@ -63,10 +57,6 @@ pub fn process_instruction(
             if *authority_info.key != authority {
                 return Err(ProgramError::InvalidArgument);
             }
-
-            // Rent info is a system account that is used to calculate rent checks
-            let rent_info = next_account_info(accounts_iter)?;
-            let _spl_token_info = next_account_info(accounts_iter)?;
 
             // Initialize account for spl token
             spl_initialize_account(
