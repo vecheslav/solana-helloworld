@@ -24,7 +24,7 @@ pub fn initialize(
     authority: Pubkey,
 ) -> Instruction {
     let accounts = vec![
-        AccountMeta::new(helloworld, true),
+        AccountMeta::new(helloworld, false),
         AccountMeta::new_readonly(liquidity_mint, false),
         AccountMeta::new(liquidity_token_account, false),
         AccountMeta::new(collateral_mint, false),
